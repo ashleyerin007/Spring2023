@@ -64,10 +64,34 @@ def get_list():
     
     return menu_list['venue'].tolist()
 
-    cursor.close()
+# list of university names; 5 most productive schools in terms of publications assoc w faculty
+
+def top_schools():
+    sql4 = '''
+    SELECT DISTINCT university.name, COUNT(faculty_publication.publication_id) AS pubs
+    FROM university
+    JOIN faculty
+    ON university.id = faculty.university_id
+    JOIN faculty_publication
+    ON faculty.id = faculty_publication.faculty_id
+    GROUP BY university.name
+    ORDER BY pubs DESC
+    LIMIT 5;
+    '''
+
+    with engine.connect() as cnx:
+        schools_list = pd.read_sql(sql4, cnx)
+
+    #print(schools_list.name.tolist())
+
+    return schools_list.name.tolist()
+
+
+cursor.close()
 
 
 if __name__ == '__main__':
     show_table()
     scatterp()
     get_list()
+    top_schools()
